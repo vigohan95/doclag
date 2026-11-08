@@ -1,0 +1,89 @@
+{
+ "e2b": {
+  "C": {
+   "calls": 400,
+   "median_out_tokens": 441.5,
+   "mean_out_tokens": 497.6,
+   "hit_budget": 0,
+   "unparsed": 0
+  },
+  "FC": {
+   "calls": 400,
+   "median_out_tokens": 460.0,
+   "mean_out_tokens": 516.8,
+   "hit_budget": 1,
+   "unparsed": 1
+  },
+  "SC": {
+   "calls": 400,
+   "median_out_tokens": 512.0,
+   "mean_out_tokens": 573.9,
+   "hit_budget": 1,
+   "unparsed": 1
+  },
+  "SC_minus_FC_tokens_per_item": {
+   "n": 200,
+   "median": 30.0,
+   "share_positive": 0.63
+  },
+  "items": 200
+ },
+ "e4b": {
+  "C": {
+   "calls": 794,
+   "median_out_tokens": 333.5,
+   "mean_out_tokens": 362.5,
+   "hit_budget": 0,
+   "unparsed": 0
+  },
+  "FC": {
+   "calls": 794,
+   "median_out_tokens": 370.0,
+   "mean_out_tokens": 382.0,
+   "hit_budget": 0,
+   "unparsed": 0
+  },
+  "SC": {
+   "calls": 794,
+   "median_out_tokens": 467.0,
+   "mean_out_tokens": 494.0,
+   "hit_budget": 0,
+   "unparsed": 0
+  },
+  "SC_minus_FC_tokens_per_item": {
+   "n": 397,
+   "median": 63.5,
+   "share_positive": 0.7329974811083123
+  },
+  "items": 397
+ },
+ "12b": {
+  "C": {
+   "calls": 400,
+   "median_out_tokens": 342.0,
+   "mean_out_tokens": 554.2,
+   "hit_budget": 12,
+   "unparsed": 12
+  },
+  "FC": {
+   "calls": 400,
+   "median_out_tokens": 367.5,
+   "mean_out_tokens": 515.0,
+   "hit_budget": 8,
+   "unparsed": 8
+  },
+  "SC": {
+   "calls": 400,
+   "median_out_tokens": 629.5,
+   "mean_out_tokens": 1089.2,
+   "hit_budget": 60,
+   "unparsed": 60
+  },
+  "SC_minus_FC_tokens_per_item": {
+   "n": 200,
+   "median": 210.0,
+   "share_positive": 0.795
+  },
+  "items": 200
+ }
+}

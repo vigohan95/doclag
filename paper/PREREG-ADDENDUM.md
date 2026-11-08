@@ -1,0 +1,2 @@
+## Post-hoc additions (written after E4B test results were seen; exploratory, not part of the frozen plan)
+The preloaded tool loop showed a large effect and low code reading. Two arms were added with a separate script, `run_agent2.py`, so the frozen `run_agent.py` is unchanged: a stronger instruction in the system message (`-rule`) and a harness gate that refuses an answer until a source file has been read (`-gate`). Both are run with stale and fixed passages. They are labelled post hoc in the paper.

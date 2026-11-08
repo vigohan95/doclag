@@ -1,0 +1,350 @@
+[
+ {
+  "id": "451479f981",
+  "repo": "psf/black",
+  "sha": "994ef7eeb18172178552daa1f36f001d156ad583",
+  "pip_spec": "git+https://github.com/psf/black@994ef7eeb18172178552daa1f36f001d156ad583",
+  "probe": "import re, sys\nfrom black.const import DEFAULT_INCLUDES\nobs = {s: bool(re.search(DEFAULT_INCLUDES, \"x\" + s)) for s in (\".py\", \".pyi\", \".ipynb\", \".txt\")}\nprint(obs, file=sys.stderr)\nif obs[\".py\"] and obs[\".pyi\"] and obs[\".ipynb\"] and not obs[\".txt\"]:\n    print(\"TRUTH\")\nelif not obs[\".py\"] and obs[\".pyi\"] and obs[\".ipynb\"]:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "4ade79d389",
+  "repo": "psf/black",
+  "sha": "9da384c516697220e33dd378c5e5e80c513d452c",
+  "pip_spec": "git+https://github.com/psf/black@9da384c516697220e33dd378c5e5e80c513d452c",
+  "probe": "import sys\nfrom black.mode import Mode, TargetVersion\nkey = Mode(target_versions={TargetVersion.PY311}, line_length=77).get_cache_key()\nfirst = key.split(\".\")[0]\nprint(key, file=sys.stderr)\nif first == str(TargetVersion.PY311.value):\n    print(\"TRUTH\")\nelif first == \"77\":\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "fbd9245bec",
+  "repo": "psf/black",
+  "sha": "7e98ea162fae70913eedb4830c2613df31413972",
+  "pip_spec": "git+https://github.com/psf/black@7e98ea162fae70913eedb4830c2613df31413972",
+  "probe": "import pathlib, re, subprocess, sys, tempfile\nd = pathlib.Path(tempfile.mkdtemp())\n(d / \"pyproject.toml\").write_text(\"[tool.black]\\nline-length = 88\\n\")\n(d / \"a.py\").write_text(\"x = 1\\n\")\nr = subprocess.run([sys.executable, \"-m\", \"black\", \"-v\", \"--check\", \"a.py\"], cwd=d,\n                   capture_output=True, text=True, timeout=45)\ntext = r.stdout + r.stderr\nlines = [x for x in text.splitlines() if \"configuration\" in x.lower()]\nprint(lines, file=sys.stderr)\nif any(\"Using configuration from project root.\" in x for x in lines):\n    print(\"TRUTH\")\nelif any(re.search(r\"Using configuration from .*pyproject\\.toml\", x) for x in lines):\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "6e55c0ab6f",
+  "repo": "psf/requests",
+  "sha": "a044b020dea43230585126901684a0f30ec635a8",
+  "pip_spec": "git+https://github.com/psf/requests@a044b020dea43230585126901684a0f30ec635a8",
+  "probe": "import sys, types\nfrom requests.utils import stream_decode_response_unicode\nchunks = [b\"ab\", b\"\\xc3\\xa9\"]\nout = list(stream_decode_response_unicode(iter(chunks), types.SimpleNamespace(encoding=None)))\nprint(out, file=sys.stderr)\nif out == chunks:\n    print(\"TRUTH\")\nelif out and all(isinstance(x, str) for x in out):\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "5f75c0463a",
+  "repo": "Textualize/textual",
+  "sha": "e875e4c6f436ea471b15df36283c9b7f96025adb",
+  "pip_spec": "git+https://github.com/Textualize/textual@e875e4c6f436ea471b15df36283c9b7f96025adb",
+  "probe": "import inspect, sys\nfrom textual.content import Content\nnames = list(inspect.signature(Content.get_optimal_width).parameters)[1:]\nprint(names, file=sys.stderr)\nif names == [\"rules\", \"container_width\"]:\n    print(\"TRUTH\")\nelif names == [\"widget\", \"container_size\"]:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "6c5972a919",
+  "repo": "Textualize/textual",
+  "sha": "e875e4c6f436ea471b15df36283c9b7f96025adb",
+  "pip_spec": "git+https://github.com/Textualize/textual@e875e4c6f436ea471b15df36283c9b7f96025adb",
+  "probe": "import inspect, sys\nfrom textual.content import Content\nseen = []\nclass Rec(dict):\n    def get(self, key, default=None):\n        seen.append(key)\n        return super().get(key, default)\nfirst = list(inspect.signature(Content.get_height).parameters)[1]\nerr = None\nheight = None\ntry:\n    height = Content(\"hello world\").get_height(Rec(), 5)\nexcept Exception as e:\n    err = repr(e)\nprint(first, height, seen, err, file=sys.stderr)\nif err is None and isinstance(height, int) and any(k in seen for k in (\"text_overflow\", \"text_wrap\")):\n    print(\"TRUTH\")\nelif first in (\"widget\", \"parent\"):\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "b5ca0bd521",
+  "repo": "scrapy/scrapy",
+  "sha": "b6e94fde65502c4bd293ae9b6705b735b98d3f5c",
+  "pip_spec": "git+https://github.com/scrapy/scrapy@b6e94fde65502c4bd293ae9b6705b735b98d3f5c",
+  "probe": "import codecs, sys\nfrom scrapy.http import TextResponse\nr = TextResponse(\"http://x.test/\", body=b\"\\xef\\xbb\\xbfhello\",\n                 headers={\"Content-Type\": \"text/html; charset=shift_jis\"})\nenc = codecs.lookup(r.encoding).name\nprint(r.encoding, enc, file=sys.stderr)\nif enc.startswith(\"utf-8\"):\n    print(\"TRUTH\")\nelif enc == \"shift_jis\":\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "28db7c3d0d",
+  "repo": "stanfordnlp/dspy",
+  "sha": "f603036ecfe8ac36053b1d6952d9cf3907937b23",
+  "pip_spec": "git+https://github.com/stanfordnlp/dspy@f603036ecfe8ac36053b1d6952d9cf3907937b23",
+  "probe": "import inspect, sys\nfrom dspy.teleprompt.mipro_optimizer import MIPRO\nps = list(inspect.signature(MIPRO.__init__).parameters)\nprint(ps, file=sys.stderr)\nif \"num_candidates\" in ps and \"n\" not in ps:\n    print(\"TRUTH\")\nelif \"n\" in ps and \"num_candidates\" not in ps:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "9ae4130d50",
+  "repo": "stanfordnlp/dspy",
+  "sha": "873bdc5acb426620367442f10f89cb2757589fbf",
+  "pip_spec": "git+https://github.com/stanfordnlp/dspy@873bdc5acb426620367442f10f89cb2757589fbf",
+  "probe": "import sys\nimport dspy\nex = dspy.Example(article=\"a\", summary=\"s\").with_inputs(\"article\")\ntext = repr(ex.inputs())\nprint(text, file=sys.stderr)\nif \"input_keys={'article'}\" in text:\n    print(\"TRUTH\")\nelif \"input_keys=None\" in text:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "347260ab66",
+  "repo": "mem0ai/mem0",
+  "sha": "dc7f88363fd0abd5c448f466bfed57a78fcf411a",
+  "pip_spec": "git+https://github.com/mem0ai/mem0@dc7f88363fd0abd5c448f466bfed57a78fcf411a",
+  "extra_pip": [
+   "upstash-vector"
+  ],
+  "probe": "import sys\nfrom mem0.configs.vector_stores.upstash_vector import UpstashVectorConfig\nv = UpstashVectorConfig(url=\"https://x.test\", token=\"dummy\").collection_name\nprint(repr(v), file=sys.stderr)\nif v == \"mem0\":\n    print(\"TRUTH\")\nelif v == \"\":\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "9aca7dc734",
+  "repo": "mem0ai/mem0",
+  "sha": "5676bebd5f364af8d04ece489db4aaf999ec81ac",
+  "pip_spec": "git+https://github.com/mem0ai/mem0@5676bebd5f364af8d04ece489db4aaf999ec81ac",
+  "extra_pip": [
+   "upstash-vector"
+  ],
+  "probe": "import os, sys\nos.environ[\"MEM0_TELEMETRY\"] = \"False\"\nimport httpx\nfrom mem0.client.main import MemoryClient\nseen = []\ndef handler(request):\n    seen.append(request.headers.get(\"authorization\"))\n    return httpx.Response(200, json={\"user_email\": \"u@x.test\", \"org_id\": \"o\", \"project_id\": \"p\"})\ntry:\n    MemoryClient(api_key=\"dummy-key\", client=httpx.Client(transport=httpx.MockTransport(handler)))\nexcept Exception as e:\n    print(\"constructor raised\", repr(e), file=sys.stderr)\nif not seen:\n    raise SystemExit(\"no request was sent\")\nscheme = seen[0].split()[0] if seen[0] else \"\"\nprint(scheme, file=sys.stderr)\nif scheme == \"Token\":\n    print(\"TRUTH\")\nelif scheme == \"Bearer\":\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "6cc592ee30",
+  "repo": "gradio-app/gradio",
+  "sha": "8cae37810a82d84f08a785e66f07e1e8cb36c2c1",
+  "pip_spec": "git+https://github.com/gradio-app/gradio@8cae37810a82d84f08a785e66f07e1e8cb36c2c1",
+  "probe": "import inspect, sys\nimport gradio as gr\nps = inspect.signature(gr.Slider.__init__).parameters\nnames = list(ps)\nprint(names[:6], any(p.kind == p.VAR_KEYWORD for p in ps.values()), file=sys.stderr)\nif \"value\" in names and \"default\" not in names:\n    print(\"TRUTH\")\nelif \"default\" in names and \"value\" not in names:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "c701888273",
+  "repo": "gradio-app/gradio",
+  "sha": "8cae37810a82d84f08a785e66f07e1e8cb36c2c1",
+  "pip_spec": "git+https://github.com/gradio-app/gradio@8cae37810a82d84f08a785e66f07e1e8cb36c2c1",
+  "probe": "import sys\nimport gradio as gr\nvalue_ok = gr.Slider(0, 100, value=42).value == 42\ntry:\n    default_ok = gr.Slider(0, 100, default=42).value == 42\nexcept TypeError as e:\n    default_ok = False\n    print(repr(e), file=sys.stderr)\nprint(value_ok, default_ok, file=sys.stderr)\nif value_ok and not default_ok:\n    print(\"TRUTH\")\nelif default_ok and not value_ok:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "afccb217d7",
+  "repo": "gradio-app/gradio",
+  "sha": "8cae37810a82d84f08a785e66f07e1e8cb36c2c1",
+  "pip_spec": "git+https://github.com/gradio-app/gradio@8cae37810a82d84f08a785e66f07e1e8cb36c2c1",
+  "probe": "import inspect, sys\nimport gradio as gr\nctor = \"cache_examples\" in inspect.signature(gr.Interface.__init__).parameters\nlaunch = \"cache_examples\" in inspect.signature(gr.Interface.launch).parameters\nprint(ctor, launch, file=sys.stderr)\nif ctor and not launch:\n    print(\"TRUTH\")\nelif launch and not ctor:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "016143422b",
+  "repo": "openai/whisper",
+  "sha": "5979f03701209bb035a0a466f14131aeb1116cbb",
+  "pip_spec": "git+https://github.com/openai/whisper@5979f03701209bb035a0a466f14131aeb1116cbb",
+  "pre_pip": [
+   "torch",
+   "--index-url",
+   "https://download.pytorch.org/whl/cpu"
+  ],
+  "pre_pip2": [
+   "setuptools<81"
+  ],
+  "pip_opts": [
+   "--no-build-isolation"
+  ],
+  "probe": "import argparse, sys\nfrom whisper.transcribe import cli\nclass Stop(Exception):\n    pass\ngot = {}\ndef fake(self, *a, **k):\n    got[\"parser\"] = self\n    raise Stop()\nargparse.ArgumentParser.parse_args = fake\ntry:\n    cli()\nexcept Stop:\n    pass\nv = got[\"parser\"].get_default(\"model\")\nprint(repr(v), file=sys.stderr)\nif v == \"turbo\":\n    print(\"TRUTH\")\nelif v == \"small\":\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "03be879e53",
+  "repo": "HKUDS/LightRAG",
+  "sha": "12e35cb6d1a2022008d874e0a1b3814b1cfd0f98",
+  "pip_spec": "git+https://github.com/HKUDS/LightRAG@12e35cb6d1a2022008d874e0a1b3814b1cfd0f98",
+  "probe": "import dataclasses, sys\nfrom lightrag import LightRAG\nf = {x.name: x for x in dataclasses.fields(LightRAG)}[\"llm_model_name\"]\nv = f.default if f.default is not dataclasses.MISSING else f.default_factory()\nprint(repr(v), file=sys.stderr)\nif v == \"gpt-4o-mini\":\n    print(\"TRUTH\")\nelif v == \"meta-llama/Llama-3.2-1B-Instruct\":\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "8d24b9f4d5",
+  "repo": "HKUDS/LightRAG",
+  "sha": "12e35cb6d1a2022008d874e0a1b3814b1cfd0f98",
+  "pip_spec": "git+https://github.com/HKUDS/LightRAG@12e35cb6d1a2022008d874e0a1b3814b1cfd0f98",
+  "probe": "import dataclasses, sys\nfrom lightrag import LightRAG\nf = {x.name: x for x in dataclasses.fields(LightRAG)}[\"working_dir\"]\nv = f.default if f.default is not dataclasses.MISSING else f.default_factory()\nprint(repr(v), file=sys.stderr)\nif v == \"./rag_storage\":\n    print(\"TRUTH\")\nelif str(v).lstrip(\"./\").startswith(\"lightrag_cache\"):\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "1d003d0840",
+  "repo": "HKUDS/LightRAG",
+  "sha": "12e35cb6d1a2022008d874e0a1b3814b1cfd0f98",
+  "pip_spec": "git+https://github.com/HKUDS/LightRAG@12e35cb6d1a2022008d874e0a1b3814b1cfd0f98",
+  "probe": "import os, subprocess, sys\ncode = (\"import dataclasses\\nfrom lightrag import LightRAG\\n\"\n        \"print('V=%s' % {x.name: x for x in dataclasses.fields(LightRAG)}['max_file_paths'].default)\")\ndef under(name):\n    env = dict(os.environ)\n    env.pop(\"MAX_FILE_PATHS\", None)\n    env.pop(\"DEFAULT_MAX_FILE_PATHS\", None)\n    env[name] = \"1234\"\n    r = subprocess.run([sys.executable, \"-c\", code], env=env, capture_output=True, text=True, timeout=28)\n    if r.returncode != 0:\n        raise SystemExit(r.stderr[-800:])\n    return [x for x in r.stdout.splitlines() if x.startswith(\"V=\")][-1][2:]\na = under(\"MAX_FILE_PATHS\")\nb = under(\"DEFAULT_MAX_FILE_PATHS\")\nprint(a, b, file=sys.stderr)\nif a == \"1234\" and b != \"1234\":\n    print(\"TRUTH\")\nelif b == \"1234\" and a != \"1234\":\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "470e6648c4",
+  "repo": "HKUDS/LightRAG",
+  "sha": "6ee909ad2ab99e5eede2a30221f4c7d237789586",
+  "pip_spec": "git+https://github.com/HKUDS/LightRAG@6ee909ad2ab99e5eede2a30221f4c7d237789586",
+  "probe": "import inspect, sys\nfrom lightrag.utils import use_llm_func_with_cache\nfirst = list(inspect.signature(use_llm_func_with_cache).parameters)[0]\nprint(first, file=sys.stderr)\nif first == \"user_prompt\":\n    print(\"TRUTH\")\nelif first == \"input_text\":\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "879faad960",
+  "repo": "agno-agi/agno",
+  "sha": "915b548ecc717fe76102ffce8b84a80ef5a59116",
+  "subdirectory": "libs/agno",
+  "pip_spec": "git+https://github.com/agno-agi/agno@915b548ecc717fe76102ffce8b84a80ef5a59116#subdirectory=libs/agno",
+  "probe": "import inspect, sys\nfrom agno.session.agent import AgentSession\nps = list(inspect.signature(AgentSession.get_messages).parameters)\nprint(ps, file=sys.stderr)\nif \"limit\" in ps and \"last_n_messages\" not in ps:\n    print(\"TRUTH\")\nelif \"last_n_messages\" in ps and \"limit\" not in ps:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "78f4c8bc29",
+  "repo": "langchain-ai/langchain",
+  "sha": "d5b4b7e05cc3f8c270c5f0300a2b5f1abc01bb7d",
+  "subdirectory": "libs/core",
+  "pip_spec": "git+https://github.com/langchain-ai/langchain@d5b4b7e05cc3f8c270c5f0300a2b5f1abc01bb7d#subdirectory=libs/core",
+  "probe": "import importlib, sys\ndef has(mod):\n    try:\n        return hasattr(importlib.import_module(mod), \"InMemoryRateLimiter\")\n    except ImportError as e:\n        print(mod, repr(e), file=sys.stderr)\n        return False\na = has(\"langchain_core.rate_limiters\")\nb = has(\"langchain_core.runnables\")\nprint(a, b, file=sys.stderr)\nif a and not b:\n    print(\"TRUTH\")\nelif b and not a:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "68232d9bdb",
+  "repo": "langchain-ai/langgraph",
+  "sha": "54dadadac44d46819f53d04dc8f4f2bd87c40a5a",
+  "subdirectory": "libs/langgraph",
+  "pip_spec": "git+https://github.com/langchain-ai/langgraph@54dadadac44d46819f53d04dc8f4f2bd87c40a5a#subdirectory=libs/langgraph",
+  "extra_pip": [
+   "langchain-core==0.3.68"
+  ],
+  "probe": "import sys\nimport langgraph.graph as g\nin_all = \"Send\" in getattr(g, \"__all__\", [])\nattr = hasattr(g, \"Send\")\nprint(in_all, attr, file=sys.stderr)\nif not in_all and not attr:\n    print(\"TRUTH\")\nelif in_all and attr:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "01d924f855",
+  "repo": "github/spec-kit",
+  "sha": "9bd3512025885b00f20e5a39c9273c7cf32d4c57",
+  "pip_spec": "git+https://github.com/github/spec-kit@9bd3512025885b00f20e5a39c9273c7cf32d4c57",
+  "probe": "import pathlib, sys, tempfile\nfrom specify_cli.integrations.kimi import KimiIntegration\nfrom specify_cli.integrations.manifest import IntegrationManifest\nroot = pathlib.Path(tempfile.mkdtemp())\nlegacy = root / \".kimi\" / \"skills\" / \"speckit.oldcmd\"\nlegacy.mkdir(parents=True)\n(legacy / \"SKILL.md\").write_text(\"LEGACY-SKILL-MARKER\\n\")\nMARK = \"LEGACY-CONTEXT-MARKER\\n\"\nctx = [root / \"KIMI.md\", root / \".kimi\" / \"KIMI.md\"]\nfor c in ctx:\n    c.write_text(MARK)\nKimiIntegration().setup(root, IntegrationManifest(\"kimi\", root), parsed_options={\"migrate_legacy\": True})\nmoved = (root / \".kimi-code\" / \"skills\" / \"speckit-oldcmd\" / \"SKILL.md\").is_file() and not legacy.exists()\nctx_same = all(c.is_file() and c.read_text() == MARK for c in ctx)\nleaked = [str(p.relative_to(root)) for p in root.rglob(\"*\")\n          if p.is_file() and p.name != \"KIMI.md\" and \"LEGACY-CONTEXT-MARKER\" in p.read_text(errors=\"replace\")]\nprint(moved, ctx_same, leaked, file=sys.stderr)\n\nif moved and ctx_same:\n    print(\"TRUTH\")\nelif moved and not ctx_same:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "ed990f1b5d",
+  "repo": "github/spec-kit",
+  "sha": "9bd3512025885b00f20e5a39c9273c7cf32d4c57",
+  "pip_spec": "git+https://github.com/github/spec-kit@9bd3512025885b00f20e5a39c9273c7cf32d4c57",
+  "probe": "import pathlib, sys, tempfile\nfrom specify_cli.integrations.kimi import KimiIntegration\nfrom specify_cli.integrations.manifest import IntegrationManifest\nroot = pathlib.Path(tempfile.mkdtemp())\nlegacy = root / \".kimi\" / \"skills\" / \"speckit.oldcmd\"\nlegacy.mkdir(parents=True)\n(legacy / \"SKILL.md\").write_text(\"LEGACY-SKILL-MARKER\\n\")\nMARK = \"LEGACY-CONTEXT-MARKER\\n\"\nctx = [root / \"KIMI.md\", root / \".kimi\" / \"KIMI.md\"]\nfor c in ctx:\n    c.write_text(MARK)\nKimiIntegration().setup(root, IntegrationManifest(\"kimi\", root), parsed_options={\"migrate_legacy\": True})\nmoved = (root / \".kimi-code\" / \"skills\" / \"speckit-oldcmd\" / \"SKILL.md\").is_file() and not legacy.exists()\nctx_same = all(c.is_file() and c.read_text() == MARK for c in ctx)\nleaked = [str(p.relative_to(root)) for p in root.rglob(\"*\")\n          if p.is_file() and p.name != \"KIMI.md\" and \"LEGACY-CONTEXT-MARKER\" in p.read_text(errors=\"replace\")]\nprint(moved, ctx_same, leaked, file=sys.stderr)\n\nif any(x.endswith(\"AGENTS.md\") for x in leaked):\n    print(\"STALE\")\nelif moved and ctx_same and not leaked:\n    print(\"TRUTH\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "743f73dc9a",
+  "repo": "github/spec-kit",
+  "sha": "9fe1c4cc5ce90c93a4d7db5759cfba43142b996b",
+  "pip_spec": "git+https://github.com/github/spec-kit@9fe1c4cc5ce90c93a4d7db5759cfba43142b996b",
+  "probe": "import pathlib, sys, tempfile\nfrom specify_cli.presets import PresetResolver\nroot = pathlib.Path(tempfile.mkdtemp())\ntop = root / \"top.md\"\nbase = root / \"base.md\"\ntop.write_text(\"TOP-LAYER\\n\")\nbase.write_text(\"BASE-LAYER\\n\")\nr = PresetResolver(root)\nr.collect_all_layers = lambda *a, **k: [\n    {\"path\": top, \"source\": \"probe 1.0\", \"strategy\": \"prepend\"},\n    {\"path\": base, \"source\": \"core\", \"strategy\": \"replace\"},\n]\nout = r.resolve_content(\"spec-template\", \"template\")\nprint(repr(out), file=sys.stderr)\nif out and \"BASE-LAYER\" in out and \"TOP-LAYER\" in out and out.index(\"TOP-LAYER\") < out.index(\"BASE-LAYER\"):\n    print(\"TRUTH\")\nelif out and \"BASE-LAYER\" not in out:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "8947280b59",
+  "repo": "github/spec-kit",
+  "sha": "dc2cec4f568d0f6e2cdfb8571c69116bc55c1aaf",
+  "pip_spec": "git+https://github.com/github/spec-kit@dc2cec4f568d0f6e2cdfb8571c69116bc55c1aaf",
+  "probe": "import sys\nimport specify_cli.workflows as w\nif not w.STEP_REGISTRY:\n    w._register_builtin_steps()\nmods = sorted({type(s).__module__ for s in w.STEP_REGISTRY.values()})\nprint(mods, file=sys.stderr)\nif mods and all(\".workflows.step.\" in m for m in mods):\n    print(\"TRUTH\")\nelif mods and all(\".workflows.steps.\" in m for m in mods):\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "89f735aa7c",
+  "repo": "github/spec-kit",
+  "sha": "48870ad4e3d3ea6180e606048d775d8562eb704c",
+  "pip_spec": "git+https://github.com/github/spec-kit@48870ad4e3d3ea6180e606048d775d8562eb704c",
+  "probe": "import os, pathlib, sys, tempfile\nfrom typer.testing import CliRunner\nimport specify_cli\nroot = pathlib.Path(tempfile.mkdtemp())\n(root / \".specify\").mkdir()\nos.chdir(root)\nurl = \"https://example.com/catalog.json\"\nrunner = CliRunner()\nr1 = runner.invoke(specify_cli.app, [\"extension\", \"catalog\", \"add\", url, \"--name\", \"probe\"])\ncfg = root / \".specify\" / \"extension-catalogs.yml\"\nok1 = r1.exit_code == 0 and cfg.is_file() and url in cfg.read_text()\nr2 = runner.invoke(specify_cli.app, [\"extension\", \"add-catalog\", url])\nok2 = r2.exit_code == 0\nprint(r1.exit_code, ok1, r2.exit_code, ok2, r1.output[-300:], r2.output[-300:], file=sys.stderr)\nif ok1 and not ok2:\n    print(\"TRUTH\")\nelif ok2 and not ok1:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "f9a1f24ddc",
+  "repo": "github/spec-kit",
+  "sha": "31a06101ef832bac32968df5e94607a51630b895",
+  "pip_spec": "git+https://github.com/github/spec-kit@31a06101ef832bac32968df5e94607a51630b895",
+  "probe": "import pathlib, sys, tempfile\nfrom specify_cli import ensure_constitution_from_template\nroot = pathlib.Path(tempfile.mkdtemp())\nfor d in (\".specify\", \"base\"):\n    t = root / d / \"templates\" / \"constitution-template.md\"\n    t.parent.mkdir(parents=True)\n    t.write_text(\"CONSTITUTION\\n\")\nensure_constitution_from_template(root)\na = (root / \".specify\" / \"memory\" / \"constitution.md\").is_file()\nb = (root / \"base\" / \"memory\" / \"constitution.md\").is_file()\nprint(a, b, file=sys.stderr)\nif a and not b:\n    print(\"TRUTH\")\nelif b and not a:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "60c1a4d0b8",
+  "repo": "browser-use/browser-use",
+  "sha": "672d2c92eaa4c1657a88576ed5dc75e688052141",
+  "pip_spec": "git+https://github.com/browser-use/browser-use@672d2c92eaa4c1657a88576ed5dc75e688052141",
+  "probe": "import inspect, sys\nfrom browser_use.agent.service import Agent\nv = inspect.signature(Agent.run).parameters[\"max_steps\"].default\nprint(repr(v), file=sys.stderr)\nif v == 500:\n    print(\"TRUTH\")\nelif v == 100:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "c37dd065c3",
+  "repo": "browser-use/browser-use",
+  "sha": "672d2c92eaa4c1657a88576ed5dc75e688052141",
+  "pip_spec": "git+https://github.com/browser-use/browser-use@672d2c92eaa4c1657a88576ed5dc75e688052141",
+  "probe": "import os, sys\nos.environ.pop(\"TIMEOUT_NavigateToUrlEvent\", None)\nfrom browser_use.browser.events import NavigateToUrlEvent\nv = NavigateToUrlEvent(url=\"http://x.test/\").event_timeout\nprint(repr(v), file=sys.stderr)\nif v == 30.0:\n    print(\"TRUTH\")\nelif v == 15.0:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "2e6acf41a1",
+  "repo": "huggingface/transformers",
+  "sha": "b856a67bea4fdbb5368de1c8a9f183df048dafbe",
+  "pip_spec": "git+https://github.com/huggingface/transformers@b856a67bea4fdbb5368de1c8a9f183df048dafbe",
+  "pre_pip": [
+   "torch",
+   "--index-url",
+   "https://download.pytorch.org/whl/cpu"
+  ],
+  "extra_pip": [
+   "accelerate"
+  ],
+  "probe": "import sys\nfrom transformers.generation.stopping_criteria import MaxTimeCriteria\ndef attempt(name):\n    try:\n        c = MaxTimeCriteria(1.0, **{name: 123.0})\n    except TypeError as e:\n        print(name, repr(e), file=sys.stderr)\n        return False\n    return c.initial_timestamp == 123.0\na = attempt(\"initial_timestamp\")\nb = attempt(\"initial_time\")\nprint(a, b, file=sys.stderr)\nif a and not b:\n    print(\"TRUTH\")\nelif b and not a:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "849c141a5c",
+  "repo": "huggingface/transformers",
+  "sha": "4563ba2c6f88d77ef2e47d80b2ec6c82a3589d17",
+  "pip_spec": "git+https://github.com/huggingface/transformers@4563ba2c6f88d77ef2e47d80b2ec6c82a3589d17",
+  "pre_pip": [
+   "torch",
+   "--index-url",
+   "https://download.pytorch.org/whl/cpu"
+  ],
+  "extra_pip": [
+   "accelerate"
+  ],
+  "probe": "import inspect, sys\nfrom transformers import Trainer\nps = inspect.signature(Trainer.compute_loss).parameters\nnames = list(ps)[1:]\nprint(ps, file=sys.stderr)\nif (names == [\"model\", \"inputs\", \"return_outputs\", \"num_items_in_batch\"]\n        and ps[\"return_outputs\"].default is False and ps[\"num_items_in_batch\"].default is None):\n    print(\"TRUTH\")\nelif names == [\"model\", \"inputs\", \"return_outputs\"]:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "b03797a7dc",
+  "repo": "huggingface/transformers",
+  "sha": "4563ba2c6f88d77ef2e47d80b2ec6c82a3589d17",
+  "pip_spec": "git+https://github.com/huggingface/transformers@4563ba2c6f88d77ef2e47d80b2ec6c82a3589d17",
+  "pre_pip": [
+   "torch",
+   "--index-url",
+   "https://download.pytorch.org/whl/cpu"
+  ],
+  "extra_pip": [
+   "accelerate"
+  ],
+  "probe": "import sys\nfrom transformers.trainer_callback import CallbackHandler, TrainerCallback, TrainerControl, TrainerState\nreturned = {\"should_save\": True}\nclass CB(TrainerCallback):\n    def on_step_end(self, args, state, control, **kwargs):\n        return returned\ncontrol = TrainerControl()\nout = CallbackHandler([CB()], None, None, None, None).on_step_end(None, TrainerState(), control)\nprint(type(out), control.should_save, file=sys.stderr)\nif out is returned and control.should_save is False:\n    print(\"TRUTH\")\nelif out is control and control.should_save is True:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "9ed493a9c8",
+  "repo": "run-llama/llama_index",
+  "sha": "044a439dc2fda53c991e49a43e4e8e652dd8a735",
+  "subdirectory": "llama-index-core",
+  "pip_spec": "git+https://github.com/run-llama/llama_index@044a439dc2fda53c991e49a43e4e8e652dd8a735#subdirectory=llama-index-core",
+  "probe": "import inspect, sys\nfrom llama_index.core.workflow import Workflow\nps = list(inspect.signature(Workflow.run).parameters)\nprint(ps, file=sys.stderr)\nif \"ctx\" in ps and \"context\" not in ps:\n    print(\"TRUTH\")\nelif \"context\" in ps and \"ctx\" not in ps:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "2204a517e6",
+  "repo": "huggingface/pytorch-image-models",
+  "sha": "3bef09f831434dfea770135ff5eec5911e0e03d0",
+  "pip_spec": "git+https://github.com/huggingface/pytorch-image-models@3bef09f831434dfea770135ff5eec5911e0e03d0",
+  "pre_pip": [
+   "torch",
+   "torchvision",
+   "--index-url",
+   "https://download.pytorch.org/whl/cpu"
+  ],
+  "probe": "import sys\nfrom timm.optim._optim_factory import list_optimizers\nbnb = list_optimizers(\"bnb*\")\nbits = list_optimizers(\"bits*\")\nprint(bnb, bits, file=sys.stderr)\nif bnb and not bits:\n    print(\"TRUTH\")\nelif bits and not bnb:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "0f4b1b5857",
+  "repo": "D4Vinci/Scrapling",
+  "sha": "3d4b427168b7a984a3b7c523306767823c9fae0e",
+  "pip_spec": "git+https://github.com/D4Vinci/Scrapling@3d4b427168b7a984a3b7c523306767823c9fae0e",
+  "probe": "import sys\nfrom scrapling.core.mixins import SelectorsGeneration as S\na = isinstance(getattr(S, \"generate_css_selector\", None), property)\nb = isinstance(getattr(S, \"css_selector\", None), property)\nprint(a, b, file=sys.stderr)\nif a and not b:\n    print(\"TRUTH\")\nelif b and not a:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "ecc08c9237",
+  "repo": "D4Vinci/Scrapling",
+  "sha": "880b144af0b0491fde3a24fa6fbeaf946179ecb2",
+  "pip_spec": "scrapling[fetchers] @ git+https://github.com/D4Vinci/Scrapling@880b144af0b0491fde3a24fa6fbeaf946179ecb2",
+  "extra_pip": [
+   "browserforge"
+  ],
+  "probe": "import sys\nimport camoufox.pkgman\ncamoufox.pkgman.installed_verstr = lambda: \"135.0.1\"  # _base.py asks at import; no Camoufox browser here\nfrom scrapling.fetchers.chrome import DynamicFetcher\ndef attempt(name):\n    # a non-dict value is rejected up front, before any browser starts, only for a key fetch reads\n    try:\n        DynamicFetcher.fetch(\"http://127.0.0.1:9/\", **{name: \"not-a-dict\"})\n    except Exception as e:\n        return type(e).__name__ + \": \" + str(e)[:200]\n    return \"no error\"\na = attempt(\"selector_config\")\nb = attempt(\"custom_config\")\nprint(a, \"|\", b, file=sys.stderr)\nsel = \"selector_config\" in a and \"must be a dictionary\" in a\ncus = \"custom_config\" in b and \"must be a dictionary\" in b\nif sel and not cus:\n    print(\"TRUTH\")\nelif cus and not sel:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "2ad140e3c2",
+  "repo": "NandhaKishorM/laya",
+  "sha": "4097b7c58495d119cfca2324e0c3d71de6212b85",
+  "pip_spec": "git+https://github.com/NandhaKishorM/laya@4097b7c58495d119cfca2324e0c3d71de6212b85",
+  "pre_pip": [
+   "torch",
+   "--index-url",
+   "https://download.pytorch.org/whl/cpu"
+  ],
+  "probe": "import sys\nfrom laya.evals import _answer_confidence\nv = _answer_confidence({\"type\": \"choice\", \"answer_confidence\": 0.9, \"confidence\": 0.1})\nprint(v, file=sys.stderr)\nif v == 0.9:\n    print(\"TRUTH\")\nelif v == 0.1:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "2d62866000",
+  "repo": "NandhaKishorM/laya",
+  "sha": "60b5c860535b31b0b5eda7552b41a28cb90c9d50",
+  "pip_spec": "git+https://github.com/NandhaKishorM/laya@60b5c860535b31b0b5eda7552b41a28cb90c9d50",
+  "pre_pip": [
+   "torch",
+   "--index-url",
+   "https://download.pytorch.org/whl/cpu"
+  ],
+  "probe": "import os, sys\nimport torch\nimport laya.agent as a\ndef under(value):\n    os.environ[\"LAYA_CPU_AMP\"] = value\n    return a._cpu_amp_dtype()\nshort = under(\"bf16\")\nlong_ = under(\"bfloat16\")\nprint(short, long_, file=sys.stderr)\nif short == torch.bfloat16 and long_ == torch.bfloat16:\n    print(\"TRUTH\")\nelif short == torch.bfloat16 and long_ is None:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ },
+ {
+  "id": "a7bc1ae3cb",
+  "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+  "sha": "e2effd57755d580318cce65ea1b2f98d896d5d40",
+  "pip_spec": null,
+  "clone": true,
+  "probe": "import os, pathlib, sys, tempfile\nsys.path.insert(0, os.path.join(os.environ[\"REPO_DIR\"], \"src\", \"ui-ux-pro-max\", \"scripts\"))\nfrom design_system import DesignSystemGenerator, persist_design_system\nout = pathlib.Path(tempfile.mkdtemp())\nds = DesignSystemGenerator().generate(\"saas dashboard\", \"Probe Proj\")\npersist_design_system(ds, output_dir=str(out))\nfound = sorted(str(p.relative_to(out)) for p in out.rglob(\"MASTER.md\"))\nprint(found, file=sys.stderr)\nif found == [os.path.join(\"design-system\", \"probe-proj\", \"MASTER.md\")]:\n    print(\"TRUTH\")\nelif found == [os.path.join(\"design-system\", \"MASTER.md\")]:\n    print(\"STALE\")\nelse:\n    print(\"OTHER\")\n"
+ }
+]

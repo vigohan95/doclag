@@ -1,0 +1,55 @@
+{
+ "repos_listed_with_permissive_licence": 649,
+ "repos_mined_ok": 643,
+ "repos_clone_failed": 6,
+ "raw_hunks": 33072,
+ "pool_snapshot": {
+  "note": "final pool built when 644 repos were done; earlier triage rounds used a per-repo cap of 40, final pool 14",
+  "raw_hunks_at_snapshot": 30396,
+  "after_rules": 16952,
+  "after_cap14": 4806,
+  "passages_attached": 4256
+ },
+ "triage": {
+  "keep": 1105,
+  "drop": 1296,
+  "pool": 4256,
+  "triaged_total": 1038
+ },
+ "stage3": {
+  "decisions": 908,
+  "keep": 458,
+  "validator_rejects": {
+   "question leaks option": 1,
+   "window too long": 1,
+   "python AST differs": 4
+  },
+  "model_rejects": {
+   "not-code": 79,
+   "version-only": 10,
+   "wording": 67,
+   "no-evidence": 143,
+   "other": 17,
+   "code-disagrees": 82,
+   "addition": 52
+  },
+  "items": 452
+ },
+ "audit": {
+  "auditor_choices": {
+   "truth": 446,
+   "stale": 0,
+   "distractor": 0,
+   "cant": 6,
+   "missing": 0
+  },
+  "kept": 446
+ },
+ "final": {
+  "after_cap12": 443,
+  "dev": 46,
+  "test": 397,
+  "repos": 185,
+  "test_repos": 161
+ }
+}

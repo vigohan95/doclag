@@ -1,0 +1,19 @@
+{
+ "decisions": 908,
+ "keep": 458,
+ "validator_rejects": {
+  "question leaks option": 1,
+  "window too long": 1,
+  "python AST differs": 4
+ },
+ "model_rejects": {
+  "not-code": 79,
+  "version-only": 10,
+  "wording": 67,
+  "no-evidence": 143,
+  "other": 17,
+  "code-disagrees": 82,
+  "addition": 52
+ },
+ "items": 452
+}

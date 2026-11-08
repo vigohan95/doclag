@@ -1,0 +1,8 @@
+75778cc3c4f8815693410de14afc80cc0e1c4a8aa205547bef9b98c59c33b0ac */d/income-engine/modules/bounties/hackathons/gemma4-paper/PREREG.md
+658d7a3bc6b2803f75b2d38c9d000885aa5b4ef896760c7b4976f6978c97263e *eval/analyze.py
+99644a3613e963e024ef816940ba00c73d471d45e73eeda4bb9a9c6245387aa6 *eval/analyze_extra.py
+d2c5003692e6bb796f61bece99df659d25c437663f849d19a815e38b8def9035 *eval/run_eval.py
+568050a1e1b010ad4e96deb6466f168cba0839f50b3eefb1c0f177ac4a87e182 *eval/run_agent.py
+ae6a48702ebc6a0e5dcc327c65002930ed2da0e8a65b714b3fad755134b61d65 *data_v1/items_test.jsonl
+084a07ba19eaf91a116b11240f2183285601b2c3d9df0281648537d01248f58e *data_v1/items_agent.jsonl
+Sat Nov  7 15:47:43 UTC 2026

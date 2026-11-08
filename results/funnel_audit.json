@@ -1,0 +1,36 @@
+{
+ "auditor_choices": {
+  "truth": 446,
+  "stale": 0,
+  "distractor": 0,
+  "cant": 6,
+  "missing": 0
+ },
+ "kept": 446,
+ "flagged": [
+  [
+   "167222dab2",
+   "cant"
+  ],
+  [
+   "c2fbf50738",
+   "cant"
+  ],
+  [
+   "c78f17a40e",
+   "cant"
+  ],
+  [
+   "15c1e229ec",
+   "cant"
+  ],
+  [
+   "685d63a799",
+   "cant"
+  ],
+  [
+   "b3c29b2e10",
+   "cant"
+  ]
+ ]
+}
