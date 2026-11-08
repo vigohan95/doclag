@@ -86,7 +86,7 @@ Items were written and filtered by Claude models; the blind solver and the probe
 
 ## 7. Release and AI use
 
-Code, items, raw model outputs for every call and the analysis scripts are in the repository, with the frozen plan and hashes. Item text comes from permissively licensed repositories, listed with commit SHAs in `ATTRIBUTION.tsv`. AI assistance: Claude models (Haiku, Sonnet, Opus 5.5) triaged candidates, wrote and audited items, wrote most of the code and drafted this text; every number in the paper is read from a results file produced by the released scripts.
+Code, items, raw model outputs for every call and the analysis scripts are in the repository (https://github.com/vigohan95/doclag), with the frozen plan and hashes. Item text comes from permissively licensed repositories, listed with commit SHAs in `ATTRIBUTION.tsv`. AI assistance: Claude models (Haiku, Sonnet, Opus 5.5) triaged candidates, wrote and audited items, wrote most of the code and drafted this text; every number in the paper is read from a results file produced by the released scripts.
 
 ## References
 
